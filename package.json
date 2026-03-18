@@ -1,0 +1,19 @@
+{
+  "name": "report-assist",
+  "version": "1.0.0",
+  "description": "A web platform for citizens to report non-emergency crimes.",
+  "main": "src/backend/server.js",
+  "scripts": {
+    "start": "node src/backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.2.2",
+    "express": "^4.18.2",
+    "pg": "^8.16.3"
+  }
+}
