@@ -51,7 +51,7 @@ function createAuthRoutes({ pool, sessionManager }) {
 module.exports = { createAuthRoutes };
 
 const express = require('express');
-const router = express.Router();
+//const router = express.Router();
 
 // POST /api/auth/login
 router.post('/login', (req, res) => {

@@ -4,12 +4,16 @@ CREATE TYPE user_role AS ENUM ('CITIZEN', 'TRIAGE_OFFICER', 'ASSIGNED_OFFICER');
 -- Create an ENUM type for report status
 CREATE TYPE report_status AS ENUM ('PENDING', 'ASSIGNED', 'CLOSED');
 
+ -- Create an ENUM for account status
+CREATE TYPE account_status_enum AS ENUM ('ACTIVE', 'INACTIVE', 'SUSPENDED');
+
 -- Users Table: Stores information about all system users
 CREATE TABLE Users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL, -- For login
     password_hash VARCHAR(255) NOT NULL,
     role user_role NOT NULL,
+    account_status account_status_enum NOT NULL DEFAULT 'ACTIVE',
     badge_id VARCHAR(50), -- UNIQUE for officers, NULL for citizens
     contact_info VARCHAR(255), -- For citizens
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -41,6 +45,25 @@ CREATE TABLE Evidence (
     file_type VARCHAR(50), -- e.g., 'image/jpeg', 'video/mp4'
     uploaded_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (report_id) REFERENCES Reports(report_id) ON DELETE CASCADE
+);
+
+-- Audit Logs Table: For system accountability and Admin review
+CREATE TABLE AuditLogs (
+    log_id SERIAL PRIMARY KEY,
+    action VARCHAR(50) NOT NULL, -- e.g., 'LOGIN', 'DEACTIVATE_USER'
+    actor_user_id INT, -- Who performed the action
+    target_user_id INT, -- Who was affected (if applicable)
+    details JSONB, -- Flexible storage for metadata
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (actor_user_id) REFERENCES Users(user_id)
+);
+
+-- Sessions Table: To manage server-side sessions and allow immediate invalidation
+CREATE TABLE Sessions (
+    session_id VARCHAR(255) PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES Users(user_id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 -- Create indexes for faster lookups on foreign keys and frequently queried columns

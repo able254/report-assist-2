@@ -9,6 +9,8 @@ const { requireRole } = require('../middleware/auth');
 function createAdminRoutes({ sessionManager, userService, pool }) {
   // all admin routes require SYSTEM_ADMIN
   router.use(requireRole(['SYSTEM_ADMIN']));
+    // Middleware: All routes here require SYSTEM_ADMIN role
+    router.use(requireRole(['SYSTEM_ADMIN']));
 
   router.get('/logs', async (req, res, next) => {
     try {
@@ -23,6 +25,15 @@ function createAdminRoutes({ sessionManager, userService, pool }) {
       next(e);
     }
   });
+    // GET /api/admin/logs
+    router.get('/logs', async (req, res, next) => {
+        try {
+            const logs = await userService.reviewLogs(req.user.userId);
+            res.json({ success: true, logs });
+        } catch (e) {
+            next(e);
+        }
+    });
 
   router.post('/users/:userId/status', async (req, res, next) => {
     try {
@@ -31,6 +42,16 @@ function createAdminRoutes({ sessionManager, userService, pool }) {
       if (!['ACTIVE', 'INACTIVE'].includes(status)) {
         return res.status(400).json({ success: false, message: 'Invalid status' });
       }
+    // POST /api/admin/user-status
+    router.post('/user-status', async (req, res, next) => {
+        try {
+            const { userId, status } = req.body;
+            const result = await userService.toggleAccountStatus(req.user.userId, userId, status);
+            res.json(result);
+        } catch (e) {
+            next(e);
+        }
+    });
 
       const updated = await userService.toggleAccountStatus({
         adminUserId: req.user.userId,
@@ -51,6 +72,7 @@ function createAdminRoutes({ sessionManager, userService, pool }) {
   });
 
   return router;
+    return router;
 }
 
 module.exports = { createAdminRoutes };
