@@ -7,7 +7,7 @@ function generateCaseNumber() {
     const year = new Date().getFullYear();
     // Generates a 5-digit random number
     const randomNumber = Math.floor(10000 + Math.random() * 90000).toString();
-    return `RA-${year}-${randomNumber.substring(0, 5)}`;
+    return `OB-${year}-${randomNumber.substring(0, 5)}`;
 }
 
 // For Node.js environment
